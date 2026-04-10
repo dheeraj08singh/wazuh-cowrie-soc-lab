@@ -1,0 +1,17 @@
+<group name="cowrie,ssh,attack">
+
+  <!-- Base rule -->
+  <rule id="100010" level="5">
+    <field name="eventid">cowrie.login.failed</field>
+    <description>Cowrie SSH login failed</description>
+    <group>authentication_failed,</group>
+  </rule>
+
+  <!-- Correlation rule WITHOUT same_source_ip -->
+  <rule id="100020" level="12" frequency="5" timeframe="60">
+    <if_matched_sid>100010</if_matched_sid>
+    <description>🚨 Cowrie SSH Brute Force Attack</description>
+    <group>bruteforce,attack,</group>
+  </rule>
+
+</group>
