@@ -1,8 +1,8 @@
-\# 🚨 SOC Detection Lab using Wazuh + Cowrie Honeypot
+🚨 SOC Detection Lab using Wazuh + Cowrie Honeypot
 
 
 
-\## 📌 Overview
+📌 Overview
 
 
 
@@ -24,7 +24,7 @@ The goal of this project is to understand how security monitoring works in real 
 
 
 
-\## 🧠 Architecture
+🧠 Architecture
 
 
 
@@ -40,7 +40,7 @@ Attacker → Cowrie Honeypot → Log File → Wazuh Agent → Wazuh Manager → 
 
 
 
-\## ⚙️ Tools \& Technologies
+⚙️ Tools \& Technologies
 
 
 
@@ -58,11 +58,11 @@ Attacker → Cowrie Honeypot → Log File → Wazuh Agent → Wazuh Manager → 
 
 
 
-\## 🚀 Project Setup
+🚀 Project Setup
 
 
 
-\### 1️⃣ Install Wazuh
+1️⃣ Install Wazuh
 
 
 
@@ -76,7 +76,7 @@ Attacker → Cowrie Honeypot → Log File → Wazuh Agent → Wazuh Manager → 
 
 
 
-\### 2️⃣ Install Cowrie Honeypot
+2️⃣ Install Cowrie Honeypot
 
 
 
@@ -98,7 +98,7 @@ pip install -r requirements.txt
 
 
 
-\### 3️⃣ Integrate Cowrie Logs with Wazuh
+3️⃣ Integrate Cowrie Logs with Wazuh
 
 
 
@@ -108,20 +108,13 @@ Edit Wazuh configuration file:
 
 📄 `/var/ossec/etc/ossec.conf`
 
+ <!-- ✅ Your Cowrie log -->
+  <localfile>
+    <log_format>json</log_format>
+    <location>/home/kali/Desktop/cowrie_soc/cowrie/var/log/cowrie/cowrie.json</location>
+  </localfile>
 
-
-```xml
-
-<localfile>
-
-&#x20; <log\_format>json</log\_format>
-
-&#x20; <location>/home/kali/Desktop/cowrie\_soc/cowrie/var/log/cowrie/cowrie.json</location>
-
-</localfile>
-
-```
-
+</ossec_config>
 
 
 Restart Wazuh:
@@ -140,7 +133,7 @@ sudo systemctl restart wazuh-manager
 
 
 
-\## 🔐 Detection Rules
+🔐 Detection Rules
 
 
 
@@ -150,42 +143,23 @@ sudo systemctl restart wazuh-manager
 
 ```xml
 
+<!-- Rule 1: Detect single failed login -->
 <group name="cowrie,ssh,attack">
+<!--  Base rule  -->
+<rule id="100010" level="5">
+<field name="eventid">cowrie.login.failed</field>
+<description>Cowrie SSH login failed</description>
+<group>authentication_failed,</group>
+</rule>
 
-
-
-&#x20; <!-- Rule 1: Detect single failed login -->
-
-&#x20; <rule id="100010" level="5">
-
-&#x20;   <field name="eventid">cowrie.login.failed</field>
-
-&#x20;   <description>Cowrie SSH login failed</description>
-
-&#x20;   <group>authentication\_failed,</group>
-
-&#x20; </rule>
-
-
-
-&#x20; <!-- Rule 2: Detect brute force attack -->
-
-&#x20; <rule id="100020" level="12" frequency="5" timeframe="60">
-
-&#x20;   <if\_matched\_sid>100010</if\_matched\_sid>
-
-&#x20;   <same\_source\_ip />
-
-&#x20;   <description>🚨 Brute Force Attack Detected</description>
-
-&#x20;   <group>bruteforce,attack,</group>
-
-&#x20; </rule>
-
-
-
+<!-- Rule 2: Detect brute force attack -->
+<!--  Correlation rule WITHOUT same_source_ip  -->
+<rule id="100020" level="12" frequency="5" timeframe="60">
+<if_matched_sid>100010</if_matched_sid>
+<description>🚨 Cowrie SSH Brute Force Attack</description>
+<group>bruteforce,attack,</group>
+</rule>
 </group>
-
 ```
 
 
@@ -202,15 +176,12 @@ sudo systemctl restart wazuh-manager
 
 
 
-\---
+
+🔍 Detection Logic Explained
 
 
 
-\## 🔍 Detection Logic Explained
-
-
-
-\### ✅ Rule 100010
+✅ Rule 100010
 
 
 
@@ -232,7 +203,7 @@ eventid = cowrie.login.failed
 
 
 
-\### 🚨 Rule 100020 (Correlation Rule)
+🚨 Rule 100020 (Correlation Rule)
 
 
 
@@ -242,11 +213,11 @@ eventid = cowrie.login.failed
 
 
 
-&#x20; \* 5 failed logins
+ \* 5 failed logins
 
-&#x20; \* Within 60 seconds
+ \* Within 60 seconds
 
-&#x20; \* From same IP
+ \* From same IP
 
 
 
@@ -258,7 +229,7 @@ eventid = cowrie.login.failed
 
 
 
-\## 📊 Sample Logs
+📊 Sample Logs
 
 
 
@@ -266,25 +237,19 @@ eventid = cowrie.login.failed
 
 {
 
-&#x20; "eventid": "cowrie.login.failed",
+ "eventid": "cowrie.login.failed",
 
-&#x20; "username": "root",
+ "username": "root",
 
-&#x20; "password": "test",
+ "password": "test",
 
-&#x20; "src\_ip": "127.0.0.1"
+ "src\_ip": "127.0.0.1"
 
 }
 
 ```
 
-
-
-\---
-
-
-
-\## 📸 Screenshots
+📸 Screenshots
 
 
 
@@ -306,7 +271,7 @@ Add screenshots in `/screenshots` folder:
 
 
 
-\## ✅ Output
+✅ Output
 
 
 
@@ -324,7 +289,7 @@ Add screenshots in `/screenshots` folder:
 
 
 
-\## 🧠 Key Learnings
+🧠 Key Learnings
 
 
 
@@ -343,12 +308,8 @@ Add screenshots in `/screenshots` folder:
 \---
 
 
+📂 Repository Structure
 
-\## 📂 Repository Structure
-
-
-
-```
 
 wazuh-cowrie-soc-lab/
 
@@ -390,23 +351,11 @@ wazuh-cowrie-soc-lab/
 
 
 
-\## 🙌 Author
+🙌 Author
 
 
 
 \*\*Dheeraj Singh\*\*
 
 Cybersecurity Enthusiast | SOC | SIEM
-
-
-
-\---
-
-
-
-\## ⭐ If you found this useful
-
-
-
-Feel free to ⭐ the repository and connect with me on LinkedIn!
 
