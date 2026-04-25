@@ -56,6 +56,68 @@ Attacker → Cowrie Honeypot → Log File → Wazuh Agent → Wazuh Manager → 
 
 \---
 
+🔍 Network Reconnaissance & Vulnerability Analysis
+
+To enhance the SOC lab, additional analysis was performed using Nmap to identify exposed services and validate potential vulnerabilities.
+
+🎯 Objective
+
+Identify externally exposed services
+Validate attack surface detected in the SOC lab
+Correlate vulnerabilities with SIEM alerts
+
+🧪 Scans Performed
+
+1️⃣ Localhost Scan - nmap 127.0.0.1
+
+Findings:
+
+Port 443 (HTTPS)
+Port 9200 (Elasticsearch)
+
+Insight: Some services are accessible internally but not exposed externally.
+
+2️⃣ Service Detection Scan - nmap -sV 10.0.2.15
+
+Findings:
+
+Port 443 open (HTTPS)
+Web application with login endpoint (/app/login)
+
+Insight: External attack surface is limited to HTTPS service.
+
+3️⃣ Vulnerability Scan - nmap --script vuln 10.0.2.15
+
+🚨 Vulnerabilities Identified
+
+Potential Slowloris DoS
+
+CVE: CVE-2007-6750
+Type: Denial of Service
+State: Likely Vulnerable
+
+Note: This is a generic detection and may result in false positives. Further validation is required.
+
+HTTP Method Tampering (High Risk)
+State: Vulnerable (Exploitable)
+Impact: Authentication bypass
+
+Description: Improper handling of HTTP methods may allow bypassing authentication controls.
+
+🔗 Correlation with SOC Detection
+
+Component	Role
+Cowrie	Attack simulation (SSH brute-force)
+Wazuh	Alert generation
+Nmap	Exposure and vulnerability validation
+
+🛠️ Security Recommendations
+
+Restrict external access to HTTPS service (IP allowlisting)
+Implement rate limiting to mitigate DoS attacks
+Fix improper HTTP method handling
+Enable monitoring for web-based attacks in Wazuh
+
 
 
 🚀 Project Setup
